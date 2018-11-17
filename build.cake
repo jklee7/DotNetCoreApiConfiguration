@@ -11,6 +11,7 @@ Task("Clean")
 	{
 	  DotNetCoreClean(".");
 	  CleanDirectory("./artifacts");
+	  CleanDirectory("./build");
 	});
 
 Task("Restore")
