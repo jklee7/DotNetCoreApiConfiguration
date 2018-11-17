@@ -1,15 +1,10 @@
 #tool "nuget:?package=GitVersion.CommandLine"
+#addin "nuget:?package=SharpZipLib"
+#addin "nuget:?package=Cake.Compression"
 
 // Target - The task you want to start. Runs the Default task if not specified.
 var target = Argument("Target", "Default");
 var configuration = Argument("Configuration", "Release");
-
-Task("GitVersion")
-	.Does(() =>
-	{
-		var gitversion = GitVersion().SemVer;
-		Information(gitversion);
-	});
 
 Task("Clean")
 	.Does(() =>
@@ -39,15 +34,22 @@ Task("Publish")
 	{
 		DotNetCorePublish("./", new DotNetCorePublishSettings
 		{
-			OutputDirectory = "./artifacts/"
+			OutputDirectory = "./build/"
 		});
 	});
 
+Task("CompressToZip")
+	.Does(() =>
+	{
+		var gitversion = GitVersion().SemVer;
+		ZipCompress("./build", $"./artifacts/artifact-{gitversion}.zip");
+	});
+
 Task("Default")
-	.IsDependentOn("GitVersion")
 	.IsDependentOn("Clean")
 	.IsDependentOn("Restore")
-	.IsDependentOn("Publish");
+	.IsDependentOn("Publish")
+	.IsDependentOn("CompressToZip");
 
 Task("CleanOnly")
 	.IsDependentOn("Clean");
