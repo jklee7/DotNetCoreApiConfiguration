@@ -49,7 +49,8 @@ Task("CompressToZip")
 Task("Default")
 	.IsDependentOn("Clean")
 	.IsDependentOn("Restore")
-	.IsDependentOn("Publish");
+	.IsDependentOn("Publish")
+	.IsDependentOn("CompressToZip");
 
 Task("CleanOnly")
 	.IsDependentOn("Clean");
