@@ -11,7 +11,7 @@ Task("Clean")
 	{
 	  DotNetCoreClean(".");
 	  CleanDirectory("./artifacts");
-	  CleanDirectory("./build");
+	  CleanDirectory("./publish");
 	});
 
 Task("Restore")
@@ -30,12 +30,30 @@ Task("Build")
 			});
 	});
 
+Task("Test")
+	.Does(() =>
+	{
+		var projects = GetFiles("./Tests/**/*.csproj");
+		foreach(var project in projects)
+        {
+            Information("Testing project " + project);
+            DotNetCoreTest(
+                project.ToString(),
+                new DotNetCoreTestSettings()
+                {
+                    Configuration = configuration,
+                    NoBuild = true,
+                    ArgumentCustomization = args => args.Append("--no-restore"),
+                });
+        }
+	});
+
 Task("Publish")
 	.Does(() =>
 	{
-		DotNetCorePublish("./", new DotNetCorePublishSettings
+		DotNetCorePublish("./WebApplication1", new DotNetCorePublishSettings
 		{
-			OutputDirectory = "./build/"
+			OutputDirectory = "./publish/"
 		});
 	});
 
@@ -43,12 +61,14 @@ Task("CompressToZip")
 	.Does(() =>
 	{
 		var gitversion = GitVersion().SemVer;
-		ZipCompress("./build", $"./artifacts/artifact-{gitversion}.zip");
+		ZipCompress("./publish", $"./artifacts/artifact-{gitversion}.zip");
 	});
 
 Task("Default")
 	.IsDependentOn("Clean")
 	.IsDependentOn("Restore")
+	.IsDependentOn("Build")
+	.IsDependentOn("Test")
 	.IsDependentOn("Publish");
 
 Task("CleanOnly")
