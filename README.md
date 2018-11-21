@@ -11,7 +11,9 @@ Along the way, I ran into an issue trying to run the integration test, with the 
 FileNotFoundException: Could not load file or assembly 'Microsoft.AspNetCore, Version=2.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60'. The system cannot find the file specified.
 ```
 
-This was resolved using the method described in this StackOverflow [article][4].
+This was resolved using the method described in this StackOverflow [article][4]:
+- Change the test project's <Project> tag in the first line to use the web SDK (Microsoft.NET.Sdk.Web instead of Microsoft.NET.Sdk)
+- Add a package reference to Microsoft.AspNetCore.App (or .All if you are using that inside the web project) without specifying a version
 
 
 [1]: https://stackoverflow.com/questions/46940710/getting-value-from-appsettings-json-in-net-core
